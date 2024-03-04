@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="inherited_stock_picking_batch_view_form" model="ir.ui.view">
+            <field name="name">stock.picking.batch.tree.inherit.stock_transport</field>
+            <field name="model">stock.picking.batch</field>
+            <field name="inherit_id" ref="stock_picking_batch.stock_picking_batch_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='scheduled_date']" position="after">
+                    <field name="dock_id"/>
+                    <field name="vehicle_id"/>
+                    <field name="vehicle_category_id"/>
+                    <field name="weight_ratio" widget="progressbar" invisible="not vehicle_category_id"/>
+                    <field name="volume_ratio" widget="progressbar" invisible="not vehicle_category_id"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="inherited_vpicktree_inherit_stock_picking_batch" model="ir.ui.view">
+            <field name="name">stock.picking.tree.inherit.stock_transport</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock_picking_batch.vpicktree_inherit_stock_picking_batch" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='batch_id']" position="before">
+                    <field name="weight" optional="hide"/>
+                    <field name="volume" optional="show"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="stock_picking_batch_graph" model="ir.ui.view">
+            <field name="name">stock_picking_batch.graph</field>
+            <field name="model">stock.picking.batch</field>
+            <field name="arch" type="xml">
+                <graph string="Stock Picking Batch Analysis" type="bar" stacked="True" >
+                    <field name="scheduled_date" type="row"/>
+                    <field name="vehicle_category_id" type="col"/>
+                    <field name="volume" type="measure" operator="+"/>
+                    <field name="weight" type="measure" operator="+"/>
+                    <field name="picking_ids_count" type="measure"/>
+                    <field name="move_ids_count" type="measure"/>
+                </graph>
+             </field>
+        </record>
+
+        <record id="stock_picking_batch_gantt" model="ir.ui.view">
+            <field name="name">stock_picking_batch.gantt</field>
+            <field name="model">stock.picking.batch</field>
+            <field name="arch" type="xml">
+                <gantt
+                    string="Stock Picking Batch Gantt"
+                    date_start="scheduled_date"
+                    date_stop="scheduled_date"
+                    default_group_by='vehicle_id'
+                    default_scale="year"
+                    >
+
+                    <field name="dock_id" string="Dock"/>
+                    <field name="vehicle_id" string="Vehicle"/>
+                    <field name="vehicle_category_id" string="Vehicle Category"/>
+                    <field name="weight" string="Weight"/>
+                    <field name="volume" string="Volume"/>
+                    <!-- <field name="driver_icon" string="Driver Icon"/> -->
+                    <!-- <field name="state" string="State" icon="oe_main_draft"/> -->
+                </gantt>
+            </field>
+        </record>
+
+        <record id="stock_picking_batch.stock_picking_batch_action" model="ir.actions.act_window">
+            <field name="view_mode">tree,kanban,graph,gantt</field>
+            <field name="context">{'graph_groupbys': ['scheduled_date', 'vehicle_category_id'],}</field>
+        </record>
+    </data>
+</odoo>

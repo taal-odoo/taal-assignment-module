@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="inherited_fleet_vehicle_view_form" model="ir.ui.view">
+            <field name="name">fleet.vehicle.model.form.inherit.stock_transport</field>
+            <field name="model">fleet.vehicle.model</field>
+            <field name="inherit_id" ref="fleet.fleet_vehicle_model_view_form" />
+            <field name="arch" type="xml">
+                
+            </field>
+        </record>
+    </data>
+</odoo>
