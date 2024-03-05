@@ -9,11 +9,8 @@
     'data': [
         'security/ir.model.access.csv',
 
-        # 'views/fleet_vehicle_model_views.xml',
         'views/fleet_vehicle_category_views.xml',
         'views/stock_picking_batch_views.xml',
-    ],
-    "demo": [
     ],
     'installable': True,
     'application': False,

@@ -8,8 +8,8 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='scheduled_date']" position="after">
                     <field name="dock_id"/>
-                    <field name="vehicle_id"/>
-                    <field name="vehicle_category_id"/>
+                    <field name="vehicle_id" placeholder="Third Party Provider"/>
+                    <field name="vehicle_category_id" placeholder="eg. Semi Truck"/>
                     <field name="weight_ratio" widget="progressbar" invisible="not vehicle_category_id"/>
                     <field name="volume_ratio" widget="progressbar" invisible="not vehicle_category_id"/>
                 </xpath>
@@ -33,12 +33,7 @@
             <field name="model">stock.picking.batch</field>
             <field name="arch" type="xml">
                 <graph string="Stock Picking Batch Analysis" type="bar" stacked="True" >
-                    <field name="scheduled_date" type="row"/>
-                    <field name="vehicle_category_id" type="col"/>
-                    <field name="volume" type="measure" operator="+"/>
-                    <field name="weight" type="measure" operator="+"/>
-                    <field name="picking_ids_count" type="measure"/>
-                    <field name="move_ids_count" type="measure"/>
+                    
                 </graph>
              </field>
         </record>
@@ -48,27 +43,24 @@
             <field name="model">stock.picking.batch</field>
             <field name="arch" type="xml">
                 <gantt
+                    create="0" delete="0"
                     string="Stock Picking Batch Gantt"
                     date_start="scheduled_date"
                     date_stop="scheduled_date"
-                    default_group_by='vehicle_id'
-                    default_scale="year"
-                    >
-
-                    <field name="dock_id" string="Dock"/>
-                    <field name="vehicle_id" string="Vehicle"/>
-                    <field name="vehicle_category_id" string="Vehicle Category"/>
-                    <field name="weight" string="Weight"/>
-                    <field name="volume" string="Volume"/>
-                    <!-- <field name="driver_icon" string="Driver Icon"/> -->
-                    <!-- <field name="state" string="State" icon="oe_main_draft"/> -->
+                    default_group_by='dock_id,vehicle_id'
+                    default_scale="week"
+                    color="dock_id"
+                    precision="{'day': 'hour:full', 'week': 'day:full', 'month': 'day:full', 'year': 'day:full'}"
+                    decoration-info="state == 'draft'"
+                >
+                    <field name="state" />
                 </gantt>
             </field>
         </record>
 
         <record id="stock_picking_batch.stock_picking_batch_action" model="ir.actions.act_window">
-            <field name="view_mode">tree,kanban,graph,gantt</field>
-            <field name="context">{'graph_groupbys': ['scheduled_date', 'vehicle_category_id'],}</field>
+            <field name="view_mode">tree,kanban,graph,gantt,form</field>
+            <field name="context">{'graph_groupbys': ['scheduled_date:day', 'vehicle_category_id'],}</field>
         </record>
     </data>
 </odoo>
