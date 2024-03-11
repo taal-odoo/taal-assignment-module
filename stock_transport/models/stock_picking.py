@@ -9,15 +9,11 @@ class StockPicking(models.Model):
     @api.depends('move_ids.quantity', 'move_ids.product_id.weight')
     def _compute_weight(self):
         for picking in self:
-            temp = 0
-            for move in self.move_ids:
-                temp += move.product_id.weight * move.quantity
-            picking.weight = temp
+            weight = sum(move.product_id.weight * move.quantity for move in picking.move_ids)
+            picking.weight = weight
     
     @api.depends('move_ids.quantity', 'move_ids.product_id.volume')
     def _compute_volume(self):
         for picking in self:
-            temp = 0
-            for move in self.move_ids:
-                temp += move.product_id.volume * move.quantity
-            picking.volume = temp
+            volume = sum(move.product_id.volume * move.quantity for move in picking.move_ids)
+            picking.volume = volume

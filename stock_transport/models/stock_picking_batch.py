@@ -44,7 +44,7 @@ class StockPickingBatch(models.Model):
         for record in self:
             record.picking_ids_count = len(record.picking_ids)
 
-    @api.depends('vehicle_category_id')
+    @api.depends('picking_ids.weight')
     def _compute_weight(self):
         for record in self:
             total_weight = 0
@@ -52,7 +52,7 @@ class StockPickingBatch(models.Model):
                 total_weight += picking.weight
             record.weight = total_weight
 
-    @api.depends('vehicle_category_id')
+    @api.depends('picking_ids.volume')
     def _compute_volume(self):
         for record in self:
             total_volume = 0
@@ -60,32 +60,26 @@ class StockPickingBatch(models.Model):
                 total_volume += picking.volume
             record.volume = total_volume
 
-    @api.depends('vehicle_category_id')
+    @api.depends('vehicle_category_id', 'weight')
     def _compute_weight_ratio(self):
         for record in self:
             if not record.vehicle_category_id or record.vehicle_category_id.max_weight == 0:
                 record.weight_ratio = 0
-                return True
-            max_weight = record.vehicle_category_id.max_weight
-            total_weight = 0
-            for picking in record.picking_ids:
-                total_weight += picking.weight 
-            ratio = ( total_weight / max_weight ) * 100
-            if ratio > 100:
-                raise UserError("Weight exceeds max weight of vehicle. Kindly change the vehicle or reduce quantity in batch.")
-            record.weight_ratio = ratio
-    
-    @api.depends('vehicle_category_id')
+            else:
+                max_weight = record.vehicle_category_id.max_weight
+                ratio = (record.weight / max_weight) * 100
+                if ratio > 100:
+                    raise UserError("Weight exceeds max weight of vehicle. Kindly change the vehicle or reduce quantity in batch.")
+                record.weight_ratio = ratio
+
+    @api.depends('vehicle_category_id', 'volume')
     def _compute_volume_ratio(self):
         for record in self:
             if not record.vehicle_category_id or record.vehicle_category_id.max_volume == 0:
                 record.volume_ratio = 0
-                return True
-            max_volume = record.vehicle_category_id.max_volume
-            total_volume = 0
-            for picking in record.picking_ids:
-                total_volume += picking.volume
-            ratio = ( total_volume / max_volume ) * 100
-            if ratio > 100:
-                raise UserError("Volume exceeds max volume of vehicle. Kindly change the vehicle or reduce quantity in batch.")
-            record.volume_ratio = ratio
+            else:
+                max_volume = record.vehicle_category_id.max_volume
+                ratio = (record.volume / max_volume) * 100
+                if ratio > 100:
+                    raise UserError("Volume exceeds max volume of vehicle. Kindly change the vehicle or reduce quantity in batch.")
+                record.volume_ratio = ratio
